@@ -2,76 +2,63 @@
 Модуль для определения минимального количества транспортных платформ.
 
 Минимум определяется необходимостью перевозки всех роботов с учётом
-их весов и предельной грузоподъемности платформы, а также того что на
-платформу помещается не более 2-х роботов.
-
-Модули:
-    - typing: Обеспечивает поддержку аннотаций типов.
-    - List: Обобщенный тип для списков.
+их весов и предельной грузоподъемности платформы, а также тем, что на
+платформу помещается не более двух роботов одновременно.
 
 Функции:
-    - min_platforms_required(weights: List[int], limit: int) -> int:
-        Определяет минимальное количество платформ, необходимых для перевозки всех роботов.
-    - read_input() -> tuple[List[int], int]:
+    - min_platforms_required(weights: list[int], limit: int) -> int:
+        Определяет мин. кол-во платформ, требуемых для перевозки всех роботов.
+    - read_input() -> tuple[list[int], int]:
         Считывает входные данные.
     - print_result(result: int) -> None:
         Выводит результат на консоль.
 """
 
-from typing import List
 
-
-def min_platforms_required(weights: List[int], limit: int) -> int:
+def min_platforms_required(
+    weights: list[int],
+    platform_limit: int
+) -> int:
     """
-    Определи минимальное количество транспортных платформ, необходимых для перевозки всех роботов.
+    Определи минимальное кол-во платформ, требуемых для перевозки всех роботов.
 
     :param weights: Список весов роботов.
-    :param limit: Максимальная грузоподъемность одной платформы.
-    :return: Минимальное количество платформ, необходимых для перевозки всех роботов.
+    :param platform_limit: Максимальная грузоподъемность одной платформы.
+    :return: Минимальное кол-во платформ, требуемых для перевозки всех роботов.
     """
-    # Сортируем веса роботов в порядке возрастания
-    weights.sort()
+    robot_weights = sorted(weights)
+    min_platforms_count: int = 0
+    left_pointer: int = 0
+    right_pointer: int = len(robot_weights) - 1
 
-    # Инициализируем счетчик платформ
-    platforms: int = 0
+    while left_pointer <= right_pointer:
+        if (
+            robot_weights[left_pointer] + robot_weights[right_pointer]
+            <= platform_limit
+        ):
+            left_pointer += 1
+        right_pointer -= 1
+        min_platforms_count += 1
 
-    # Инициализируем два указателя: один в начале списка, другой в конце
-    i: int = 0
-    j: int = len(weights) - 1
-
-    # Пока указатели не пересеклись
-    while i <= j:
-        # Если текущие два робота могут быть перевезены на одной платформе
-        if weights[i] + weights[j] <= limit:
-            # Перемещаем оба указателя
-            i += 1
-            j -= 1
-        else:
-            # Иначе перемещаем только указатель конца списка
-            j -= 1
-
-        # Увеличиваем счетчик платформ
-        platforms += 1
-
-    return platforms
+    return min_platforms_count
 
 
-def read_input() -> tuple[List[int], int]:
+def read_input() -> tuple[list[int], int]:
     """
     Считай входные данные.
 
     :return weights: Список весов отдельных роботов.
-    :return limit: Предельная грузоподъемность платформы.
+    :return platform_limit: Предельная грузоподъемность платформы.
     """
-    weights: List[int] = list(map(int, input().strip().split()))
-    limit: int = int(input())
+    weights: list[int] = [int(weight) for weight in input().strip().split()]
+    platform_limit: int = int(input())
 
-    return weights, limit
+    return weights, platform_limit
 
 
 def print_result(result: int) -> None:
     """
-    Выведи результаты на консоль.
+    Выведи результат на консоль.
 
     :param result: Целое число, обозначающее минимальное количество платформ.
     :return: None
@@ -80,7 +67,5 @@ def print_result(result: int) -> None:
 
 
 if __name__ == '__main__':
-    # Считывание входных данных
-    weights, limit = read_input()
-    # Вывод итогового результата
-    print_result(min_platforms_required(weights, limit))
+    weights, platform_limit = read_input()
+    print_result(min_platforms_required(weights, platform_limit))
